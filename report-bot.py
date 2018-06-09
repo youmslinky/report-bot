@@ -8,9 +8,17 @@ import time
 import datetime
 import random
 
+import sqlite3
 import validators
 
 
+conn = sqlite3.connect('pic_links.db')
+c = conn.cursor()
+
+def create_tables():
+    c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
+    c.execute('CREATE TABLE IF NOT EXISTS waifus(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
+    conn.commit()
 
 BOT_PREFIX = "."
 #Client = discord.Client()
@@ -246,6 +254,6 @@ async def access():
 async def uptime():
     await client.say("up for {}".format(datetime.timedelta(seconds=int(time.time()-time_start))))
 
-
 time_start = time.time()
+create_tables()
 client.run ("NDUyNzY0MDUxODMxOTE0NTA4.DfVE6w.s_kdvvyQK3opFjHTsv5sF1s6xo8")
