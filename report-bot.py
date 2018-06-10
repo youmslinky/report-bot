@@ -165,7 +165,7 @@ async def hentai(context,*args):
                 aliases=["w", "W", "waifus", "Waifus"],
                 pass_context=True
                 )
-async def definitely_hentai(context,*args):
+async def waifu(context,*args):
     if len(args)== 0:
     	#c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
         c.execute("SELECT * FROM waifus WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM waifus) ORDER BY RANDOM() LIMIT 1")
