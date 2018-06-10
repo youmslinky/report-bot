@@ -250,8 +250,9 @@ async def choose(*choices : str):
 # Direct link to c9 ide
 @client.command(name='access',
                 description="Access ide",
+                pass_context=True
                 )
-async def access():
+async def access(context):
     await client.say (str(context.message.author.mention) + ", https://ide.cs50.io/dchuck/ide50")
     #await client.say ("https://ide.cs50.io/dchuck/ide50")
 
