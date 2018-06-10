@@ -1,3 +1,12 @@
+#ignore pic list files
+dick_pics
+hentai_links
+hentai_links_bakcup
+pic_links.db
+report_count
+waifu_links
+
+# ignore c9 files
 .~c9*
 
 # Byte-compiled / optimized / DLL files
