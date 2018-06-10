@@ -153,7 +153,7 @@ async def hentai(context,*args):
     if args[0] == 'rm':
         for pic_id in args[1:]:
         	c.execute("DELETE FROM hentai WHERE id=?",(int(pic_id),))
-        	await client.say("pic deleted")
+        	await client.say("link removed")
         conn.commit()
         return
 
@@ -189,7 +189,7 @@ async def waifu(context,*args):
     if args[0] == 'rm':
         for pic_id in args[1:]:
         	c.execute("DELETE FROM waifus WHERE id=?",(int(pic_id),))
-        	await client.say("pic deleted")
+        	await client.say("link removed")
         conn.commit()
         return
     if args[0] == "rules":
