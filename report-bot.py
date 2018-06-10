@@ -114,13 +114,13 @@ async def eight_ball(context):
 async def summon(context, *args):
     if len(args) == 0:
         print("summon bob or nep or jeremy")
-    if args[0].lower() == 'bob':
+    elif args[0].lower() == 'bob':
         await client.say (str(context.message.author.mention) + ", http://i.imgur.com/MYSvmmi.jpg")
-    if args[0].upper() == 'NEP':
+    elif args[0].upper() == 'NEP':
         await client.say (str(context.message.author.mention) + ", https://cdn.discordapp.com/attachments/412847694583824384/454852900624269313/Nep.jpg")
-    if args[0].lower() == 'jeremy':
+    elif args[0].lower() == 'jeremy':
         await client.say (str(context.message.author.mention) + ", https://cdn.discordapp.com/attachments/452904606532632576/454849438104551424/IMG_0844.JPG")
-    if args[0].lower() == 'detain':
+    elif args[0].lower() == 'detain':
         await client.say (str(context.message.author.mention) + ", https://cdn.discordapp.com/attachments/452904606532632576/454946797048299521/SAotUxP.gif")
 
 @client.command(name='hentai',
