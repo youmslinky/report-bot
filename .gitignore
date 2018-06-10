@@ -1,3 +1,6 @@
+#ignore any file with .old
+*.old
+
 #ignore pic list files
 dick_pics
 hentai_links
