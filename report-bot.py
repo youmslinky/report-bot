@@ -131,23 +131,28 @@ async def summon(context, *args):
                 )
 async def hentai(context,*args):
     if len(args)== 0:
-        file_pointer = open('hentai_links','r')
-        possible_responses = file_pointer.readlines() # Does this skip blank lines?
-        file_pointer.close()
-        await client.say(random.choice(possible_responses))
+    	#c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
+        c.execute("SELECT * FROM hentai WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM hentai) ORDER BY RANDOM() LIMIT 1")
+        rows = c.fetchall()
+        await client.say(str(rows[0][1]) + " courtesy of " + str(rows[0][2] + "\nimage id: " + str(rows[0][0])))
         return
     if args[0] == 'add':
-        file_pointer = open('hentai_links','a')
         for link in args[1:]:
             if validators.url(link):
-                file_pointer.write(args[1])
-                #file_pointer.write(","+str(context.message.author)) #uncomment to put user data into log, but will show up in the link
-                file_pointer.write('\n')
+                c.execute("INSERT INTO hentai(link,   contributor,           unixTimeAdded,   viewNumber) VALUES (?,?,?,?)",
+                							 (args[1], str(context.message.author), int(time.time()), 0))
                 await client.say("Submission added.")
             else:
                 await client.say("invalid link")
-        file_pointer.close()
-        #Code for permissions w/ ability to approve those to use command from discord (maybe move disallowed client id's to an allowed id's file?)
+        conn.commit()
+        return
+    if args[0] == 'rm':
+        for pic_id in args[1:]:
+        	c.execute("DELETE FROM hentai WHERE id=?",(int(pic_id),))
+        	await client.say("pic deleted")
+        conn.commit()
+        return
+
 
 # I tried to put the questionable stuff towards the top of the list for easier sorting later
 @client.command(name='waifu',
@@ -158,23 +163,28 @@ async def hentai(context,*args):
                 )
 async def definitely_hentai(context,*args):
     if len(args)== 0:
-        with open('dick_pics') as file_pointer: #used this instead of file_pointer = open('dick_pics','r') and indented next 4 lines.  I don't think this really does much to the code except to create more indents.
-            possible_responses = file_pointer.readlines()
-            #file_pointer.close() #I think the "with open..." code auto calls that.
-            await client.say(random.choice(possible_responses))
-            return
+    	#c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
+        c.execute("SELECT * FROM waifus WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM waifus) ORDER BY RANDOM() LIMIT 1")
+        rows = c.fetchall()
+        print(rows)
+        await client.say(str(rows[0][1]) + " courtesy of " + str(rows[0][2] + "\nimage id: " + str(rows[0][0])))
+        return
     if args[0] == 'add':
-        file_pointer = open('dick_pics','a')
-        #with open('dick_pics') as file_pointer:
         for link in args[1:]:
             if validators.url(link):
-                file_pointer.write(args[1])
-                #file_pointer.write("#,"+str(context.message.author)) #uncomment to put user data into log, but will show up in the link
-                file_pointer.write('\n')
-                await client.say("Waifu submission added.")
+                c.execute("INSERT INTO waifus(link,   contributor,                  unixTimeAdded,    viewNumber) VALUES (?,?,?,?)",
+                							 (args[1], str(context.message.author), int(time.time()), 0))
+                await client.say("Submission added.")
             else:
-                await client.say("Invalid link")
-        file_pointer.close()
+                await client.say("invalid link")
+        conn.commit()
+        return
+    if args[0] == 'rm':
+        for pic_id in args[1:]:
+        	c.execute("DELETE FROM waifus WHERE id=?",(int(pic_id),))
+        	await client.say("pic deleted")
+        conn.commit()
+        return
     if args[0] == "rules":
         await client.say ("Rules:\n1. No nips\n2. No peens\n3. Keep it 2D\n4. Doesn't have to be human\n5. Keep yer hands off the small kids; Only big ones are allowed\n6. Keep yer hands above the table\n7. Dear GOD I hope we can all handle undies")
         #await client.say ("Rules:\n1. Nothing explicit\n2. Only waifus\n3. Undies are ok (I think?), but no butts poking out of the monitor with a lost piece of clothing in there"\n4. No real people)
