@@ -134,7 +134,11 @@ async def hentai(context,*args):
     	#c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
         c.execute("SELECT * FROM hentai WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM hentai) ORDER BY RANDOM() LIMIT 1")
         rows = c.fetchall()
-        await client.say(str(rows[0][1]) + " courtesy of " + str(rows[0][2] + "\nimage id: " + str(rows[0][0])))
+        if(rows[0][2] == None):
+            name = "someone"
+        else:
+            name = str(rows[0][2])
+        await client.say(str(rows[0][1]) + " courtesy of " + name + "\nimage id: " + str(rows[0][0]))
         return
     if args[0] == 'add':
         for link in args[1:]:
@@ -166,8 +170,11 @@ async def definitely_hentai(context,*args):
     	#c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
         c.execute("SELECT * FROM waifus WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM waifus) ORDER BY RANDOM() LIMIT 1")
         rows = c.fetchall()
-        print(rows)
-        await client.say(str(rows[0][1]) + " courtesy of " + str(rows[0][2] + "\nimage id: " + str(rows[0][0])))
+        if(rows[0][2] == None):
+            name = "someone"
+        else:
+            name = str(rows[0][2])
+        await client.say(str(rows[0][1]) + " courtesy of " + name + "\nimage id: " + str(rows[0][0]))
         return
     if args[0] == 'add':
         for link in args[1:]:
