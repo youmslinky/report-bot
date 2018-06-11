@@ -13,6 +13,7 @@ import validators
 
 
 conn = sqlite3.connect('pic_links.db')
+conn.row_factory = sqlite3.Row
 c = conn.cursor()
 
 def create_tables():
@@ -82,7 +83,17 @@ async def on_ready():
 
 
 
-
+async def post_random_link(table_name):
+	#reference for fields in database
+	#c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
+	c.execute("SELECT * FROM {} WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM waifus) ORDER BY RANDOM() LIMIT 1".format(table_name))
+	for row in c:
+	        if(row['contributor'] == None):
+	            name = "someone"
+	        else:
+	            name = str(row['contributor'])
+	        await client.say(str(row['link']) + "\nCourtesy of " + name + "\nimage id: " + str(row['id']))
+	return
 
 
 @client.command(name='8ball',
@@ -131,15 +142,8 @@ async def summon(context, *args):
                 )
 async def hentai(context,*args):
     if len(args)== 0:
-    	#c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
-        c.execute("SELECT * FROM hentai WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM hentai) ORDER BY RANDOM() LIMIT 1")
-        rows = c.fetchall()
-        if(rows[0][2] == None):
-            name = "someone"
-        else:
-            name = str(rows[0][2])
-        await client.say(str(rows[0][1]) + "\nCourtesy of " + name + "\nimage id: " + str(rows[0][0]))
-        return
+    	await post_random_link('hentai')
+    	return
     if args[0] == 'add':
         for link in args[1:]:
             if validators.url(link):
@@ -167,14 +171,7 @@ async def hentai(context,*args):
                 )
 async def waifu(context,*args):
     if len(args)== 0:
-    	#c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
-        c.execute("SELECT * FROM waifus WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM waifus) ORDER BY RANDOM() LIMIT 1")
-        rows = c.fetchall()
-        if(rows[0][2] == None):
-            name = "someone"
-        else:
-            name = str(rows[0][2])
-        await client.say(str(rows[0][1]) + "\nCourtesy of " + name + "\nimage id: " + str(rows[0][0]))
+        await post_random_link('waifus')
         return
     if args[0] == 'add':
         for link in args[1:]:
