@@ -269,6 +269,14 @@ async def access(context):
 async def uptime():
     await client.say("up for {}".format(datetime.timedelta(seconds=int(time.time()-time_start))))
 
+# posts link to github for project
+@client.command(name='github',
+                description="posts github link",
+                pass_context=True
+                )
+async def github(context):
+    await client.say (str(context.message.author.mention) + ", https://github.com/youmslinky/report-bot")
+
 time_start = time.time()
 create_tables()
 client.run ("NDUyNzY0MDUxODMxOTE0NTA4.DfVE6w.s_kdvvyQK3opFjHTsv5sF1s6xo8")
