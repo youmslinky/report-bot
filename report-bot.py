@@ -138,7 +138,7 @@ async def hentai(context,*args):
             name = "someone"
         else:
             name = str(rows[0][2])
-        await client.say(str(rows[0][1]) + " courtesy of " + name + "\nimage id: " + str(rows[0][0]))
+        await client.say(str(rows[0][1]) + "\nCourtesy of " + name + "\nimage id: " + str(rows[0][0]))
         return
     if args[0] == 'add':
         for link in args[1:]:
@@ -174,7 +174,7 @@ async def waifu(context,*args):
             name = "someone"
         else:
             name = str(rows[0][2])
-        await client.say(str(rows[0][1]) + " courtesy of " + name + "\nimage id: " + str(rows[0][0]))
+        await client.say(str(rows[0][1]) + "\nCourtesy of " + name + "\nimage id: " + str(rows[0][0]))
         return
     if args[0] == 'add':
         for link in args[1:]:
