@@ -82,21 +82,21 @@ async def on_ready():
     #     await client.send_message(message.channel, "%s" % (" ".join(args[1:]) + " has been reported."))
 
 def update_image_stats(image_id,table_name):
-	c.execute("UPDATE {} SET viewnumber = viewnumber + 1, unixTimeLastViewed = ? WHERE id = ?".format(table_name),(int(round(time.time())),image_id) )
-	conn.commit()
+    c.execute("UPDATE {} SET viewnumber = viewnumber + 1, unixTimeLastViewed = ? WHERE id = ?".format(table_name),(int(round(time.time())),image_id) )
+    conn.commit()
 
 async def post_random_link(table_name):
-	#reference for fields in database
-	#c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
-	c.execute("SELECT * FROM {} WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM waifus) ORDER BY RANDOM() LIMIT 1".format(table_name))
-	for row in c:
-	        if(row['contributor'] == None):
-	            name = "someone"
-	        else:
-	            name = str(row['contributor'])
-	        await client.say(str(row['link']) + "\nCourtesy of " + name + "\nimage id: " + str(row['id']))
-	        update_image_stats(row['id'],table_name)
-	return
+    #reference for fields in database
+    #c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
+    c.execute("SELECT * FROM {} WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM waifus) ORDER BY RANDOM() LIMIT 1".format(table_name))
+    for row in c:
+            if(row['contributor'] == None):
+                name = "someone"
+            else:
+                name = str(row['contributor'])
+            await client.say(str(row['link']) + "\nCourtesy of " + name + "\nimage id: " + str(row['id']))
+            update_image_stats(row['id'],table_name)
+    return
 async def add_links(args,context,table_name):
     #adds links, can add multiple links seperated by spaces
     for link in args[1:]:
@@ -159,13 +159,13 @@ async def summon(context, *args):
                 )
 async def hentai(context,*args):
     if len(args)== 0:
-    	await post_random_link('hentai')
-    	return
+        await post_random_link('hentai')
+        return
     if args[0] == 'add':
         for link in args[1:]:
             if validators.url(link):
                 c.execute("INSERT INTO hentai(link,   contributor,           unixTimeAdded,   viewNumber) VALUES (?,?,?,?)",
-                							 (args[1], str(context.message.author), int(round(time.time())), 0))
+                                             (args[1], str(context.message.author), int(round(time.time())), 0))
                 await client.say("Submission added.")
             else:
                 await client.say("invalid link")
@@ -173,8 +173,8 @@ async def hentai(context,*args):
         return
     if args[0] == 'rm':
         for pic_id in args[1:]:
-        	c.execute("DELETE FROM hentai WHERE id=?",(int(pic_id),))
-        	await client.say("link removed")
+            c.execute("DELETE FROM hentai WHERE id=?",(int(pic_id),))
+            await client.say("link removed")
         conn.commit()
         return
 
@@ -195,8 +195,8 @@ async def waifu(context,*args):
         return
     if args[0] == 'rm':
         for pic_id in args[1:]:
-        	c.execute("DELETE FROM waifus WHERE id=?",(int(pic_id),))
-        	await client.say("link removed")
+            c.execute("DELETE FROM waifus WHERE id=?",(int(pic_id),))
+            await client.say("link removed")
         conn.commit()
         return
     if args[0] == "rules":
