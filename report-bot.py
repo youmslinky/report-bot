@@ -81,7 +81,9 @@ async def on_ready():
     #         # args[1:] = Hey There
     #     await client.send_message(message.channel, "%s" % (" ".join(args[1:]) + " has been reported."))
 
-
+def update_image_stats(image_id,table_name):
+	c.execute("UPDATE {} SET viewnumber = viewnumber + 1, unixTimeLastViewed = ? WHERE id = ?".format(table_name),(int(round(time.time())),image_id) )
+	conn.commit()
 
 async def post_random_link(table_name):
 	#reference for fields in database
@@ -93,8 +95,7 @@ async def post_random_link(table_name):
 	        else:
 	            name = str(row['contributor'])
 	        await client.say(str(row['link']) + "\nCourtesy of " + name + "\nimage id: " + str(row['id']))
-	        c.execute("UPDATE {} SET viewnumber = viewnumber + 1, unixTimeLastViewed = ? WHERE id = ?".format(table_name),(int(round(time.time())),row['id']) )
-	        conn.commit()
+	        update_image_stats(row['id'],table_name)
 	return
 
 
