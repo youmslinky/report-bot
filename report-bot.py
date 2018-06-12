@@ -148,7 +148,7 @@ async def hentai(context,*args):
         for link in args[1:]:
             if validators.url(link):
                 c.execute("INSERT INTO hentai(link,   contributor,           unixTimeAdded,   viewNumber) VALUES (?,?,?,?)",
-                							 (args[1], str(context.message.author), int(time.time()), 0))
+                							 (args[1], str(context.message.author), int(round(time.time())), 0))
                 await client.say("Submission added.")
             else:
                 await client.say("invalid link")
@@ -177,7 +177,7 @@ async def waifu(context,*args):
         for link in args[1:]:
             if validators.url(link):
                 c.execute("INSERT INTO waifus(link,   contributor,                  unixTimeAdded,    viewNumber) VALUES (?,?,?,?)",
-                							 (args[1], str(context.message.author), int(time.time()), 0))
+                							 (args[1], str(context.message.author), int(round(time.time())), 0))
                 await client.say("Submission added.")
             else:
                 await client.say("invalid link")
