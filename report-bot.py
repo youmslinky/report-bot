@@ -97,6 +97,20 @@ async def post_random_link(table_name):
 	        await client.say(str(row['link']) + "\nCourtesy of " + name + "\nimage id: " + str(row['id']))
 	        update_image_stats(row['id'],table_name)
 	return
+async def add_links(args,context,table_name):
+    #adds links, can add multiple links seperated by spaces
+    for link in args[1:]:
+        if validators.url(link):
+            time_now = int(round(time.time()))
+            c.execute("INSERT INTO {} (link,   contributor,                  unixTimeAdded,viewNumber,unixTimeLastViewed) VALUES (?,?,?,?,?)".format(table_name),
+                                      (args[1], str(context.message.author), time_now,     0,         time_now))
+            c.execute("select id from waifus order by unixtimelastviewed desc limit 1")
+            for row in c:
+                await client.say("Submission added. link id: {}".format(row['id']))
+        else:
+            await client.say("invalid link")
+    conn.commit()
+    return
 
 
 @client.command(name='8ball',
@@ -177,14 +191,7 @@ async def waifu(context,*args):
         await post_random_link('waifus')
         return
     if args[0] == 'add':
-        for link in args[1:]:
-            if validators.url(link):
-                c.execute("INSERT INTO waifus(link,   contributor,                  unixTimeAdded,    viewNumber) VALUES (?,?,?,?)",
-                							 (args[1], str(context.message.author), int(round(time.time())), 0))
-                await client.say("Submission added.")
-            else:
-                await client.say("invalid link")
-        conn.commit()
+        await add_links(args,context,'waifus')
         return
     if args[0] == 'rm':
         for pic_id in args[1:]:
