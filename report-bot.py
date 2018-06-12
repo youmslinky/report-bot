@@ -93,6 +93,8 @@ async def post_random_link(table_name):
 	        else:
 	            name = str(row['contributor'])
 	        await client.say(str(row['link']) + "\nCourtesy of " + name + "\nimage id: " + str(row['id']))
+	        c.execute("UPDATE {} SET viewnumber = viewnumber + 1, unixTimeLastViewed = ? WHERE id = ?".format(table_name),(int(round(time.time())),row['id']) )
+	        conn.commit()
 	return
 
 
