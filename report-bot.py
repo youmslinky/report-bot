@@ -94,6 +94,14 @@ async def add_links(args,context,table_name):
     conn.commit()
     return
 
+async def rm_links(args,context):
+    for role in context.message.author.roles:
+            print(role)
+    for pic_id in args[1:]:
+        c.execute("DELETE FROM waifus WHERE id=?",(int(pic_id),))
+        await client.say("{} removed".format(pic_id))
+    conn.commit()
+    return
 
 @client.command(name='8ball',
                 description="answers a yes/no question",
@@ -147,10 +155,7 @@ async def hentai(context,*args):
         await add_links(args,context,'hentai')
         return
     if args[0] == 'rm':
-        for pic_id in args[1:]:
-            c.execute("DELETE FROM hentai WHERE id=?",(int(pic_id),))
-            await client.say("link removed")
-        conn.commit()
+        await rm_links(args,context)
         return
 
 
@@ -169,10 +174,7 @@ async def waifu(context,*args):
         await add_links(args,context,'waifus')
         return
     if args[0] == 'rm':
-        for pic_id in args[1:]:
-            c.execute("DELETE FROM waifus WHERE id=?",(int(pic_id),))
-            await client.say("link removed")
-        conn.commit()
+        await rm_links(args,context)
         return
     if args[0] == "rules":
         await client.say ("Rules:\n1. No nips\n2. No peens\n3. Keep it 2D\n4. Doesn't have to be human\n5. Keep yer hands off the small kids; Only big ones are allowed\n6. Keep yer hands above the table\n7. Dear GOD I hope we can all handle undies")
