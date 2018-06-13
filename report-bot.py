@@ -163,14 +163,7 @@ async def hentai(context,*args):
         await post_random_link('hentai')
         return
     if args[0] == 'add':
-        for link in args[1:]:
-            if validators.url(link):
-                c.execute("INSERT INTO hentai(link,   contributor,           unixTimeAdded,   viewNumber) VALUES (?,?,?,?)",
-                                             (args[1], str(context.message.author), int(round(time.time())), 0))
-                await client.say("Submission added.")
-            else:
-                await client.say("invalid link")
-        conn.commit()
+        await add_links(args,context,'hentai')
         return
     if args[0] == 'rm':
         for pic_id in args[1:]:
