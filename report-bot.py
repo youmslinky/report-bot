@@ -97,6 +97,7 @@ async def post_random_link(table_name):
             await client.say(str(row['link']) + "\nCourtesy of " + name + "\nimage id: " + str(row['id']))
             update_image_stats(row['id'],table_name)
     return
+
 async def add_links(args,context,table_name):
     #adds links, can add multiple links seperated by spaces
     for link in args[1:]:
