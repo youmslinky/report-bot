@@ -88,7 +88,7 @@ def update_image_stats(image_id,table_name):
 async def post_random_link(table_name):
     #reference for fields in database
     #c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
-    c.execute("SELECT * FROM {} WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM waifus) ORDER BY RANDOM() LIMIT 1".format(table_name))
+    c.execute("SELECT * FROM {0} WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM {0}) ORDER BY RANDOM() LIMIT 1".format(table_name))
     for row in c:
             if(row['contributor'] == None):
                 name = "someone"
