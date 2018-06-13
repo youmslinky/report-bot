@@ -75,7 +75,7 @@ async def post_random_link(table_name):
                 name = "someone"
             else:
                 name = str(row['contributor'])
-            await client.say(str(row['link']) + "\nCourtesy of " + name + "\nimage id: " + str(row['id']))
+            await client.say("{}\nCourtesy of: {}\nimage id: {}".format(row['link'], name, row['id']) )
             update_image_stats(row['id'],table_name)
     return
 
