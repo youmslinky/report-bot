@@ -177,8 +177,8 @@ async def waifu(context,*args):
         await rm_links(args,context)
         return
     if args[0] == "rules":
-        await client.say ("Rules:\n1. No nips\n2. No peens\n3. Keep it 2D\n4. Doesn't have to be human\n5. Keep yer hands off the small kids; Only big ones are allowed\n6. Keep yer hands above the table\n7. Dear GOD I hope we can all handle undies")
-        #await client.say ("Rules:\n1. Nothing explicit\n2. Only waifus\n3. Undies are ok (I think?), but no butts poking out of the monitor with a lost piece of clothing in there"\n4. No real people)
+        #await client.say ("Rules:\n1. No nips\n2. No peens\n3. Keep it 2D\n4. Doesn't have to be human\n5. Keep yer hands off the small kids; Only big ones are allowed\n6. Keep yer hands above the table\n7. Dear GOD I hope we can all handle undies")
+        await client.say ("Rules:\n1. Nothing explicit, Pls keep this SFW\n2. Only waifus\n3. If you have a question, it prolly goes to .h\n4. No real people")
     if args[0] == "remove":
         if "454966304864993281" in [role.id for role in context.message.author.roles]:
             # file_pointer = open('dick_pics', 'a')
