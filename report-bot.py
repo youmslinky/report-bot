@@ -62,25 +62,6 @@ async def on_ready():
     #     userID = message.author.id
     #     await client.send_message (message.channel, "<@%s> Dong!" % (userID))
 
-    # # if message.content.upper().startswith (".HALP"):
-    # #     userID = message.author.id
-    # #     await client.send_message (message.channel, "<@%s>, use '!' for Rythm bot and '?' for weeb bot. Use '.summon bob' to summon Bob Ross." % (userID))
-
-    # if message.content.upper().startswith ("DOUG"):
-    # #if message.content.includes ("doug"):
-    #     userID = message.author.id
-    #     await client.send_message (message.channel, "<@%s> FUCK YOU" % (userID))
-
-
-    # if message.content.upper().startswith (".REPORT"):
-    #     args = message.content.split (" ")
-    #     # .report Hey There
-    #         # args[0] = .REPORT
-    #         # args[1] = Hey
-    #         # args[2] = There
-    #         # args[1:] = Hey There
-    #     await client.send_message(message.channel, "%s" % (" ".join(args[1:]) + " has been reported."))
-
 def update_image_stats(image_id,table_name):
     c.execute("UPDATE {} SET viewnumber = viewnumber + 1, unixTimeLastViewed = ? WHERE id = ?".format(table_name),(int(round(time.time())),image_id) )
     conn.commit()
