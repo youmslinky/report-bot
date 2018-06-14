@@ -86,7 +86,7 @@ async def add_links(args,context,table_name):
             time_now = int(round(time.time()))
             c.execute("INSERT INTO {} (link,   contributor,                  unixTimeAdded,viewNumber,unixTimeLastViewed) VALUES (?,?,?,?,?)".format(table_name),
                                       (args[1], str(context.message.author), time_now,     0,         time_now))
-            c.execute("select id from {} order by unixtimelastviewed desc limit 1".fomat(table_name))
+            c.execute("select id from {} order by unixtimelastviewed desc limit 1".format(table_name))
             for row in c:
                 await client.say("Submission added. link id: {}".format(row['id']))
         else:
