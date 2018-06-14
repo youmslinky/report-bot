@@ -104,7 +104,7 @@ async def rm_links(args,context,table_name):
     return
 
 async def view_link(args,context,table_name):
-    for pic_id in args[1:]:
+    for pic_id in args:
         c.execute("SELECT * FROM {} WHERE id=?".format(table_name),(int(pic_id),))
         for row in c:
             if(row['contributor'] == None):
@@ -169,7 +169,7 @@ async def hentai(context,*args):
     if args[0] == 'rm':
         await rm_links(args,context,'hentai')
         return
-    if args[0] == 'view' or args[0] == 'v':
+    if args[0].isdigit():
         await view_link(args,context,'hentai')
         return
 
@@ -191,11 +191,13 @@ async def waifu(context,*args):
     if args[0] == 'rm':
         await rm_links(args,context,'waifus')
         return
-    if args[0] == 'view' or args[0] == 'v':
+    if args[0].isdigit():
         await view_link(args,context,'waifus')
+        return
     if args[0] == "rules":
         #await client.say ("Rules:\n1. No nips\n2. No peens\n3. Keep it 2D\n4. Doesn't have to be human\n5. Keep yer hands off the small kids; Only big ones are allowed\n6. Keep yer hands above the table\n7. Dear GOD I hope we can all handle undies")
         await client.say ("Rules:\n1. Nothing explicit, Pls keep this SFW\n2. Only waifus\n3. If you have a question, it prolly goes to .h\n4. No real people")
+        return
     if args[0] == "remove":
         if "454966304864993281" in [role.id for role in context.message.author.roles]:
             # file_pointer = open('dick_pics', 'a')
