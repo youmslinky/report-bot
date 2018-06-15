@@ -117,6 +117,11 @@ async def view_link(args,context,table_name):
             update_image_stats(row['id'],table_name)
     return
 
+def total_rows(table_name):
+    c.execute("select count(rowid) from {}".format(table_name))
+    for row in c:
+        return row['count(rowid)']
+
 @client.command(name='8ball',
                 description="answers a yes/no question",
                 brief="Answers from the beyond.",
@@ -174,6 +179,9 @@ async def hentai(context,*args):
     if args[0].isdigit():
         await view_link(args,context,'hentai')
         return
+    if args[0] == 'total':
+        await client.say("Total links: {}".format(total_rows('hentai')))
+        return
 
 
 # I tried to put the questionable stuff towards the top of the list for easier sorting later
@@ -195,6 +203,9 @@ async def waifu(context,*args):
         return
     if args[0].isdigit():
         await view_link(args,context,'waifus')
+        return
+    if args[0] == 'total':
+        await client.say("Total links: {}".format(total_rows('waifus')))
         return
     if args[0] == "rules":
         #await client.say ("Rules:\n1. No nips\n2. No peens\n3. Keep it 2D\n4. Doesn't have to be human\n5. Keep yer hands off the small kids; Only big ones are allowed\n6. Keep yer hands above the table\n7. Dear GOD I hope we can all handle undies")
