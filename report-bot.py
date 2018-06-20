@@ -1,3 +1,4 @@
+# Access github : https://github.com/youmslinky/report-bot
 import discord
 from discord.ext.commands import Bot
 from discord.ext import commands
@@ -137,7 +138,7 @@ async def eight_ball(context):
         'It is quite possible',
         'Definitely',
         'Yes',
-        'No'
+        'No',
         'Mmmmmmmmmmmmmmmmmm no'
         ]
     await client.say(random.choice(possible_responses) + ", " + context.message.author.mention)
