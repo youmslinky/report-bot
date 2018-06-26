@@ -80,6 +80,23 @@ class picture_table_interface():
         for row in self.database_cursor:
             return row['count(rowid)']
 
+    async def handle_command(self,args,context):
+        if len(args)== 0:
+            await self.post_random_link()
+            return
+        if args[0] == 'add':
+            await self.add_links(args,context)
+            return
+        if args[0] == 'rm':
+            await self.rm_links(args,context)
+            return
+        if args[0].isdigit():
+            await self.view_link(args,context)
+            return
+        if args[0] == 'total':
+            await client.say("Total links: {}".format(self.total_rows()))
+            return
+
 
 
 
@@ -181,21 +198,8 @@ async def summon(context, *args):
                 pass_context=True
                 )
 async def hentai_pics(context,*args):
-    if len(args)== 0:
-        await hentai.post_random_link()
-        return
-    if args[0] == 'add':
-        await hentai.add_links(args,context)
-        return
-    if args[0] == 'rm':
-        await hentai.rm_links(args,context)
-        return
-    if args[0].isdigit():
-        await hentai.view_link(args,context)
-        return
-    if args[0] == 'total':
-        await client.say("Total links: {}".format(hentai.total_rows()))
-        return
+    await hentai.handle_command(args,context)
+    return
 
 
 # I tried to put the questionable stuff towards the top of the list for easier sorting later
@@ -206,21 +210,8 @@ async def hentai_pics(context,*args):
                 pass_context=True
                 )
 async def waifu(context,*args):
-    if len(args)== 0:
-        await waifus.post_random_link()
-        return
-    if args[0] == 'add':
-        await waifus.add_links(args,context)
-        return
-    if args[0] == 'rm':
-        await waifus.rm_links(args,context)
-        return
-    if args[0].isdigit():
-        await waifus.view_link(args,context)
-        return
-    if args[0] == 'total':
-        await client.say("Total links: {}".format(waifus.total_rows()))
-        return
+    await waifus.handle_command(args,context)
+    return
     if args[0] == "rules":
         #await client.say ("Rules:\n1. No nips\n2. No peens\n3. Keep it 2D\n4. Doesn't have to be human\n5. Keep yer hands off the small kids; Only big ones are allowed\n6. Keep yer hands above the table\n7. Dear GOD I hope we can all handle undies")
         await client.say ("Rules:\n1. Nothing explicit, Pls keep this SFW\n2. Only waifus\n3. If you have a question, it prolly goes to .h\n4. No real people")
