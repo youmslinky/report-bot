@@ -59,7 +59,10 @@ class picture_table_interface():
                 print(role)
         for pic_id in args[1:]:
             self.database_cursor.execute("DELETE FROM {} WHERE id=?".format(self.table_name),(int(pic_id),))
-            await client.say("{} removed".format(pic_id))
+            if self.database_cursor.rowcount == 1:
+                await client.say("{} removed".format(pic_id))
+            else:
+                await client.say("{} doesn't exist".format(pic_id))
         self.database_connection.commit()
         return
 
