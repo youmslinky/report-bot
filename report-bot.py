@@ -83,19 +83,14 @@ class picture_table_interface():
     async def handle_command(self,args,context):
         if len(args)== 0:
             await self.post_random_link()
-            return
-        if args[0] == 'add':
+        elif args[0] == 'add':
             await self.add_links(args,context)
-            return
-        if args[0] == 'rm':
+        elif args[0] == 'rm':
             await self.rm_links(args,context)
-            return
-        if args[0].isdigit():
+        elif args[0].isdigit():
             await self.view_link(args,context)
-            return
-        if args[0] == 'total':
+        elif args[0] == 'total':
             await client.say("Total links: {}".format(self.total_rows()))
-            return
 
 
 
