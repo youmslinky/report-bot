@@ -68,14 +68,21 @@ class picture_table_interface():
 
     async def view_link(self,args,context):
         for pic_id in args:
-            self.database_cursor.execute("SELECT * FROM {} WHERE id=?".format(self.table_name),(int(pic_id),))
+            self.database_cursor.execute("SELECT COUNT(*) FROM {} WHERE id=?".format(self.table_name),(int(pic_id),) )
             for row in self.database_cursor:
-                if(row['contributor'] == None):
-                    name = "someone"
-                else:
-                    name = str(row['contributor'])
-                await client.say("{}\nCourtesy of: {}\nimage id: {}".format(row['link'], name, row['id']) )
-                self.update_image_stats(row['id'])
+                rowcount = row['count(*)']
+            if rowcount == 1:
+                self.database_cursor.execute("SELECT * FROM {} WHERE id=?".format(self.table_name),(int(pic_id),) )
+                for row in self.database_cursor:
+                    if(row['contributor'] == None):
+                        name = "someone"
+                    else:
+                        name = str(row['contributor'])
+
+                    await client.say("{}\nCourtesy of: {}\nimage id: {}".format(row['link'], name, row['id']) )
+                    self.update_image_stats(row['id'])
+            else:
+                await client.say("id: {} doesn't exist".format(pic_id))
         return
 
     def total_rows(self):
