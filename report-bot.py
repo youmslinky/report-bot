@@ -15,9 +15,79 @@ import sqlite3
 import validators
 
 
+class picture_table_interface():
+    #class should have: table_name, database connection, cursor
+    def __init__(self,table_name,database_connection,database_cursor):
+        self.table_name = table_name
+        self.database_connection = database_connection
+        self.database_cursor = database_cursor
+    def update_image_stats(self,image_id):
+        self.database_cursor.execute("UPDATE {} SET viewnumber = viewnumber + 1, unixTimeLastViewed = ? WHERE id = ?".format(self.table_name),(int(round(time.time())),image_id) )
+        self.database_connection.commit()
+
+    async def post_random_link(self):
+        #reference for fields in database
+        #c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
+        self.database_cursor.execute("SELECT * FROM {0} WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM {0}) ORDER BY RANDOM() LIMIT 1".format(self.table_name))
+        for row in self.database_cursor:
+                if(row['contributor'] == None):
+                    name = "someone"
+                else:
+                    name = str(row['contributor'])
+                await client.say("{}\nCourtesy of: {}\nimage id: {}".format(row['link'], name, row['id']) )
+                update_image_stats(row['id'],self.table_name)
+        return
+
+    async def add_links(self,args,context):
+        #adds links, can add multiple links seperated by spaces
+        for link in args[1:]:
+            if validators.url(link):
+                time_now = int(round(time.time()))
+                self.database_cursor.execute("INSERT INTO {} (link,   contributor,                  unixTimeAdded,viewNumber,unixTimeLastViewed) VALUES (?,?,?,?,?)".format(self.table_name),
+                                          (args[1], str(context.message.author), time_now,     0,         time_now))
+                self.database_cursor.execute("select id from {} order by unixtimelastviewed desc limit 1".format(self.table_name))
+                for row in self.database_cursor:
+                    await client.say("Submission added. link id: {}".format(row['id']))
+            else:
+                await client.say("invalid link")
+        self.database_connection.commit()
+        return
+
+    async def rm_links(self,args,context):
+        for role in context.message.author.roles:
+                print(role)
+        for pic_id in args[1:]:
+            self.database_cursor.execute("DELETE FROM {} WHERE id=?".format(self.table_name),(int(pic_id),))
+            await client.say("{} removed".format(pic_id))
+        self.database_connection.commit()
+        return
+
+    async def view_link(self,args,context):
+        for pic_id in args:
+            self.database_cursor.execute("SELECT * FROM {} WHERE id=?".format(self.table_name),(int(pic_id),))
+            for row in self.database_cursor:
+                if(row['contributor'] == None):
+                    name = "someone"
+                else:
+                    name = str(row['contributor'])
+                await client.say("{}\nCourtesy of: {}\nimage id: {}".format(row['link'], name, row['id']) )
+                update_image_stats(row['id'],self.table_name)
+        return
+
+    def total_rows(self):
+        self.database_cursor.execute("select count(rowid) from {}".format(self.table_name))
+        for row in self.database_cursor:
+            return row['count(rowid)']
+
+
+
+
 conn = sqlite3.connect('pic_links.db')
 conn.row_factory = sqlite3.Row
 c = conn.cursor()
+
+waifus = picture_table_interface(table_name='waifus',database_connection=conn,database_cursor=c)
+hentai = picture_table_interface(table_name='hentai',database_connection=conn,database_cursor=c)
 
 def create_tables():
     c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
@@ -167,21 +237,21 @@ async def summon(context, *args):
                 aliases=["h", "H"],
                 pass_context=True
                 )
-async def hentai(context,*args):
+async def hentai_pics(context,*args):
     if len(args)== 0:
-        await post_random_link('hentai')
+        await hentai.post_random_link()
         return
     if args[0] == 'add':
-        await add_links(args,context,'hentai')
+        await hentai.add_links(args,context)
         return
     if args[0] == 'rm':
-        await rm_links(args,context,'hentai')
+        await hentai.rm_links(args,context)
         return
     if args[0].isdigit():
-        await view_link(args,context,'hentai')
+        await hentai.view_link(args,context)
         return
     if args[0] == 'total':
-        await client.say("Total links: {}".format(total_rows('hentai')))
+        await client.say("Total links: {}".format(hentai.total_rows()))
         return
 
 
@@ -194,19 +264,19 @@ async def hentai(context,*args):
                 )
 async def waifu(context,*args):
     if len(args)== 0:
-        await post_random_link('waifus')
+        await waifus.post_random_link()
         return
     if args[0] == 'add':
-        await add_links(args,context,'waifus')
+        await waifus.add_links(args,context)
         return
     if args[0] == 'rm':
-        await rm_links(args,context,'waifus')
+        await waifus.rm_links(args,context)
         return
     if args[0].isdigit():
-        await view_link(args,context,'waifus')
+        await waifus.view_link(args,context)
         return
     if args[0] == 'total':
-        await client.say("Total links: {}".format(total_rows('waifus')))
+        await client.say("Total links: {}".format(waifus.total_rows()))
         return
     if args[0] == "rules":
         #await client.say ("Rules:\n1. No nips\n2. No peens\n3. Keep it 2D\n4. Doesn't have to be human\n5. Keep yer hands off the small kids; Only big ones are allowed\n6. Keep yer hands above the table\n7. Dear GOD I hope we can all handle undies")
