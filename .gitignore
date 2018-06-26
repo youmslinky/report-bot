@@ -1,3 +1,6 @@
+#ignore any database files
+*.db
+
 #ignore any file with .old
 *.old
 
