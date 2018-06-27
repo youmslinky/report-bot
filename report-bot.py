@@ -40,6 +40,16 @@ class picture_table_interface():
                 self.update_image_stats(row['id'])
         return
 
+    async def post_least_seen(self):
+        self.database_cursor.execute("SELECT * FROM {} ORDER BY viewNumber LIMIT 1".format(self.table_name))
+        for row in self.database_cursor:
+                if(row['contributor'] == None):
+                    name = "someone"
+                else:
+                    name = str(row['contributor'])
+                await client.say("{}\nCourtesy of: {}\nimage id: {}".format(row['link'], name, row['id']) )
+                self.update_image_stats(row['id'])
+
     async def add_links(self,args,context):
         #adds links, can add multiple links seperated by spaces
         for link in args[1:]:
