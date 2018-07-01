@@ -263,13 +263,13 @@ async def waifu(context,*args):
                 )
 async def roll(*args):
     if len(args)== 0: #is this the same as null?
-        await client.say("usage: .roll n \n(where n is a positive,non-zero integer)")
+        await client.say("usage: .roll n \n(where n is a natural number)")
         return
     try:
         await client.say(str(random.randint(1, int(args[0]))))
         return
     except:
-        await client.say("invalid input\nusage: .roll n\n(where n is a positive integer)")
+        await client.say("invalid input\nusage: .roll n\n(where n is a natural number)")
 
 # Report people, count reports individually and collectively, then print out values
 @client.command(name='report',
