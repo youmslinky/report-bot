@@ -16,7 +16,7 @@ import sqlite3
 import validators
 
 
-DATABASE_NAME = "report-bot.db"
+DATABASE_NAME = "bot.db"
 
 
 class picture_table_interface():
