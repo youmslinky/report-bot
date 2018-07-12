@@ -16,6 +16,9 @@ import sqlite3
 import validators
 
 
+DATABASE_NAME = "report-bot.db"
+
+
 class picture_table_interface():
     #class should have: table_name, database connection, cursor
     def __init__(self,table_name,database_connection,database_cursor):
@@ -116,7 +119,7 @@ class picture_table_interface():
 
 
 
-conn = sqlite3.connect('pic_links.db')
+conn = sqlite3.connect(DATABASE_NAME)
 conn.row_factory = sqlite3.Row
 c = conn.cursor()
 
@@ -325,8 +328,8 @@ async def github(context):
 async def database_download(*args):
     await client.say("uploading database...")
     timeStamp = dt.isoformat(dt.utcnow().replace(microsecond=0))
-    fileName = "db_backup/pic_links_{}.db".format(timeStamp)
-    process = subprocess.Popen("scp -p pic_links.db c9user@angelthump.hopto.org:/var/www/html/{}".format(fileName),stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
+    fileName = "db_backup/{}_{}.db".format(DATABASE_NAME,timeStamp)
+    process = subprocess.Popen("scp -p {} c9user@angelthump.hopto.org:/var/www/html/{}".format(DATABASE_NAME,fileName),stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
     (output, err) = process.communicate()
     #print(output.decode('UTF-8'))
     if len(args) != 0:
