@@ -17,7 +17,9 @@ import validators
 
 
 DATABASE_NAME = "bot.db"
-
+ALLOWED_ROLES = [
+"454966304864993281"]
+#bot commander 454966304864993281
 
 class picture_table_interface():
     #class should have: table_name, database connection, cursor
@@ -115,6 +117,20 @@ class picture_table_interface():
             await self.view_link(args,context)
         elif args[0] == 'total':
             await client.say("Total links: {}".format(self.total_rows()))
+
+
+async def user_has_permission(allowed_roles,context):
+    try:
+        #print(context.message.author.roles)
+        for role in context.message.author.roles:
+            print(role,role.id)
+            if role.id in allowed_roles:
+                return True
+        await client.say("{} does not have permission to do that".format(context.message.author))
+        return False
+    except:
+        await client.say("there are no roles here")
+        return False
 
 
 
