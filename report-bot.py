@@ -71,15 +71,15 @@ class picture_table_interface():
         return
 
     async def rm_links(self,args,context):
-        for role in context.message.author.roles:
-                print(role)
-        for pic_id in args[1:]:
-            self.database_cursor.execute("DELETE FROM {} WHERE id=?".format(self.table_name),(int(pic_id),))
-            if self.database_cursor.rowcount == 1:
-                await client.say("{} removed".format(pic_id))
-            else:
-                await client.say("{} doesn't exist".format(pic_id))
-        self.database_connection.commit()
+        if await user_has_permission(ALLOWED_ROLES,context):
+            for pic_id in args[1:]:
+                self.database_cursor.execute("DELETE FROM {} WHERE id=?".format(self.table_name),(int(pic_id),))
+                if self.database_cursor.rowcount == 1:
+                    await client.say("{} removed".format(pic_id))
+                else:
+                    await client.say("{} doesn't exist".format(pic_id))
+            self.database_connection.commit()
+            return
         return
 
     async def view_link(self,args,context):
