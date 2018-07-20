@@ -227,7 +227,7 @@ async def summon(context, *args):
         await client.say (str(context.message.author.mention) + ", https://cdn.discordapp.com/attachments/452904606532632576/454946797048299521/SAotUxP.gif")
 
 @client.command(name='hentai',
-                description="not actually hentai", #great description guys
+                description="Actually hentai, only allowed in nsfw channels", #great description guys
                 brief="quenches all your desires",
                 aliases=["h", "H"],
                 pass_context=True
