@@ -338,21 +338,13 @@ async def github(context):
 
 #uploads file to youm server, then posts link it in discord
 @client.command(name='database',
-                description="gives link to a copy of the database",
+                description="Uploads copy of database onto discord",
                 aliases=["db"],
+                pass_context=True
                 )
-async def database_download(*args):
+async def database_download(context,*args):
     await client.say("uploading database...")
-    timeStamp = dt.isoformat(dt.utcnow().replace(microsecond=0))
-    fileName = "db_backup/{}_{}.db".format(DATABASE_NAME,timeStamp)
-    process = subprocess.Popen("scp -p {} c9user@angelthump.hopto.org:/var/www/html/{}".format(DATABASE_NAME,fileName),stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
-    (output, err) = process.communicate()
-    #print(output.decode('UTF-8'))
-    if len(args) != 0:
-        domain = "192.168.1.55"
-    else:
-        domain = "angelthump.hopto.org"
-    await client.say("http://{}/{}".format(domain,fileName))
+    await client.send_file(context.message.channel,DATABASE_NAME)
 
 time_start = time.time()
 create_tables()
