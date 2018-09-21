@@ -346,6 +346,13 @@ async def database_download(context,*args):
     await client.say("uploading database...")
     await client.send_file(context.message.channel,DATABASE_NAME)
 
+#start main program
+try:
+    f = open('keyfile.key','r')
+    botServiceKey = f.read()
+    f.close()
+except:
+    print('You need a file named "keyfile" with an appropriate discord key to run this bot')
 time_start = time.time()
 create_tables()
-client.run ("NDUyNzY0MDUxODMxOTE0NTA4.DfVE6w.s_kdvvyQK3opFjHTsv5sF1s6xo8")
+client.run (botServiceKey.strip())
