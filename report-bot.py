@@ -352,7 +352,7 @@ try:
     botServiceKey = f.read()
     f.close()
 except:
-    print('You need a file named "keyfile" with an appropriate discord key to run this bot')
+    print('You need a file named "keyfile.key" with an appropriate discord key to run this bot')
 time_start = time.time()
 create_tables()
 client.run (botServiceKey.strip())
