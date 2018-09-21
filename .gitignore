@@ -1,3 +1,6 @@
+#ignore keyfiles, don't want secrets in git/github
+keyfile.key
+
 #ignore any database files
 *.db
 
