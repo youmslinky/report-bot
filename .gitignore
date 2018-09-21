@@ -14,6 +14,9 @@ hentai_links_bakcup
 report_count
 waifu_links
 
+#ignore vim/vi temp files
+*.swp
+
 # ignore c9 files
 .~c9*
 
