@@ -1,3 +1,6 @@
+#ignore tags file
+tags
+
 #ignore keyfiles, don't want secrets in git/github
 *.key
 
