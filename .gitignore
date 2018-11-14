@@ -1,3 +1,7 @@
+#ignore various python package control files
+Pipfile
+Pipfile.lock
+
 #ignore tags file
 tags
 
