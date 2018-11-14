@@ -311,15 +311,18 @@ async def uptime(ctx):
 async def github(ctx):
     await ctx.send(str(ctx.message.author.mention) + ", https://github.com/youmslinky/report-bot")
 
-#uploads file to youm server, then posts link it in discord
+#uploads database directly to discord with timestamped file
 @bot.command(name='database',
                 description="Uploads copy of database onto discord",
                 aliases=["db"],
                 )
 async def database_download(ctx,*args):
     await ctx.send("uploading database...")
-    #await ctx.send(ctx.message.channel,DATABASE_NAME)
-    await ctx.send(file=discord.File(DATABASE_NAME))
+    timeStamp = dt.isoformat(dt.utcnow().replace(microsecond=0))
+    fileName = "{}_{}.db".format(DATABASE_NAME.split('.')[0],timeStamp)
+    #fp is the file pointer, filename is what will be displayed in discord
+    fileToSend = discord.File(fp=DATABASE_NAME,filename=fileName)
+    await ctx.send(file=fileToSend)
 
 #start main program
 try:
