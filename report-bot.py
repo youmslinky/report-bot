@@ -258,7 +258,7 @@ async def waifu(ctx,*args):
                 description="Uses random function to generate a number from 1 to n using RNG",
                 brief="rolls an n sided die",
                 )
-async def roll(*args):
+async def roll(ctx,*args):
     if len(args)== 0: #is this the same as null?
         await ctx.send("usage: .roll n \n(where n is a natural number)")
         return
