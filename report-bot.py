@@ -145,7 +145,7 @@ def create_tables():
     c.execute('CREATE TABLE IF NOT EXISTS waifus(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
     conn.commit()
 
-BOT_PREFIX = "?"
+BOT_PREFIX = "."
 #Client = discord.Client()
 #client = commands.Bot (command_prefix = ".") # need this for @client.event's to work.
 #client = Bot(command_prefix=BOT_PREFIX)
