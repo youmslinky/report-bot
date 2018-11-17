@@ -7,7 +7,6 @@ import asyncio
 import time
 import datetime
 import random
-import subprocess
 from datetime import datetime as dt
 
 import sqlite3
