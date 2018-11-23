@@ -12,6 +12,9 @@ from datetime import datetime as dt
 import sqlite3
 import validators
 
+EGGPLANT_EMOJI = "🍆"
+HEARTS_EMOJI = "💕"
+KNIFE_EMOJI = "🔪"
 
 DATABASE_NAME = "bot.db"
 ALLOWED_ROLES = [
