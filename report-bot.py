@@ -23,10 +23,20 @@ ALLOWED_ROLES = [
 
 class picture_table_interface():
     #class should have: table_name, database connection, cursor
-    def __init__(self,table_name,database_connection,database_cursor):
+    def __init__(self,table_name,database_connection,database_cursor,isNSFW):
         self.table_name = table_name
         self.database_connection = database_connection
         self.database_cursor = database_cursor
+        self.isNSFW = isNSFW
+
+    def is_nsfw(self):
+        return self.isNSFW
+
+    async def check_if_nsfw(self,args,ctx,function):
+        if self.is_nsfw() and not ctx.channel.is_nsfw():
+            await ctx.send("This command can only be used in a NSFW channel.")
+        else:
+            await function(args,ctx)
 
     def update_image_stats(self,image_id):
         self.database_cursor.execute("UPDATE {} SET viewnumber = viewnumber + 1, unixTimeLastViewed = ? WHERE id = ?".format(self.table_name),(int(round(time.time())),image_id) )
@@ -108,13 +118,13 @@ class picture_table_interface():
 
     async def handle_command(self,args,ctx):
         if len(args)== 0:
-            await self.post_random_link(ctx)
+            await self.check_if_nsfw(args,ctx,self.post_random_link)
         elif args[0] == 'add':
             await self.add_links(args,ctx)
         elif args[0] == 'rm':
             await self.rm_links(args,ctx)
         elif args[0].isdigit():
-            await self.view_link(args,ctx)
+            await self.check_if_nsfw(args,ctx,self.view_link)
         elif args[0] == 'total':
             await ctx.send("Total links: {}".format(self.total_rows()))
 
@@ -139,8 +149,8 @@ conn = sqlite3.connect(DATABASE_NAME)
 conn.row_factory = sqlite3.Row
 c = conn.cursor()
 
-waifus = picture_table_interface(table_name='waifus',database_connection=conn,database_cursor=c)
-hentai = picture_table_interface(table_name='hentai',database_connection=conn,database_cursor=c)
+waifus = picture_table_interface(table_name='waifus',database_connection=conn,database_cursor=c,isNSFW=False)
+hentai = picture_table_interface(table_name='hentai',database_connection=conn,database_cursor=c,isNSFW=True)
 
 def create_tables():
     c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
