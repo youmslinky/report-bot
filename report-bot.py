@@ -42,7 +42,7 @@ class picture_table_interface():
         self.database_cursor.execute("UPDATE {} SET viewnumber = viewnumber + 1, unixTimeLastViewed = ? WHERE id = ?".format(self.table_name),(int(round(time.time())),image_id) )
         self.database_connection.commit()
 
-    async def post_random_link(self,ctx):
+    async def post_random_link(self,args,ctx):
         #reference for fields in database
         #c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
         self.database_cursor.execute("SELECT * FROM {0} WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM {0}) ORDER BY RANDOM() LIMIT 1".format(self.table_name))
@@ -55,7 +55,7 @@ class picture_table_interface():
                 self.update_image_stats(row['id'])
         return
 
-    async def post_least_seen(self):
+    async def post_least_seen(self,args,ctx):
         self.database_cursor.execute("SELECT * FROM {} ORDER BY viewNumber LIMIT 1".format(self.table_name))
         for row in self.database_cursor:
                 if(row['contributor'] == None):
