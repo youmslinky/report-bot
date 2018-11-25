@@ -33,6 +33,10 @@ class picture_table_interface():
         return self.isNSFW
 
     async def check_if_nsfw(self,args,ctx,function):
+        if isinstance(ctx.channel, discord.abc.PrivateChannel):
+            #this is a private channel, we don't need to check
+            await function(args,ctx)
+            return
         if self.is_nsfw() and not ctx.channel.is_nsfw():
             await ctx.send("This command can only be used in a NSFW channel.")
         else:
