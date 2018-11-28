@@ -15,6 +15,11 @@ import validators
 EGGPLANT_EMOJI = "🍆"
 HEARTS_EMOJI = "💕"
 KNIFE_EMOJI = "🔪"
+emoji_dic = {
+        EGGPLANT_EMOJI:"fucked",
+        HEARTS_EMOJI:"married",
+        KNIFE_EMOJI:"killed"
+        }
 
 DATABASE_NAME = "bot.db"
 ALLOWED_ROLES = [
@@ -51,13 +56,13 @@ class picture_table_interface():
         #c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
         self.database_cursor.execute("SELECT * FROM {0} WHERE RANDOM()<(SELECT ((1/COUNT(*))*10) FROM {0}) ORDER BY RANDOM() LIMIT 1".format(self.table_name))
         for row in self.database_cursor:
-                if(row['contributor'] == None):
-                    name = "someone"
-                else:
-                    name = str(row['contributor'])
-                await ctx.send("{}\nCourtesy of: {}\nimage id: {}".format(row['link'], name, row['id']) )
-                self.update_image_stats(row['id'])
-        return
+            if(row['contributor'] == None):
+                name = "someone"
+            else:
+                name = str(row['contributor'])
+            msg = await ctx.send("{}\nCourtesy of: {}\nimage id: {}".format(row['link'], name, row['id']) )
+            self.update_image_stats(row['id'])
+        return msg,row['id']
 
     async def post_least_seen(self,args,ctx):
         self.database_cursor.execute("SELECT * FROM {} ORDER BY viewNumber LIMIT 1".format(self.table_name))
@@ -120,6 +125,24 @@ class picture_table_interface():
         for row in self.database_cursor:
             return row['count(rowid)']
 
+    async def fmk(self,args,ctx):
+        #adds reactions to a message and then waits for a user to add another then adds the result to the database
+        msg,image_id = await self.post_random_link(args,ctx)
+        await msg.add_reaction(EGGPLANT_EMOJI)
+        await msg.add_reaction(HEARTS_EMOJI)
+        await msg.add_reaction(KNIFE_EMOJI)
+
+        def check(reaction, user):
+            return reaction.message.id == msg.id and user == ctx.message.author #and str(reaction.emoji) == '👍'
+        try:
+            reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=check)
+        except asyncio.TimeoutError:
+            pass
+            #await ctx.send('timed out')
+        else:
+            self.database_cursor.execute("UPDATE {0} SET {1} = {1} + 1 WHERE id = {2}".format(self.table_name,emoji_dic[reaction.emoji],int(image_id)))
+            self.database_connection.commit()
+
     async def handle_command(self,args,ctx):
         if len(args)== 0:
             await self.check_if_nsfw(args,ctx,self.post_random_link)
@@ -131,6 +154,8 @@ class picture_table_interface():
             await self.check_if_nsfw(args,ctx,self.view_link)
         elif args[0] == 'total':
             await ctx.send("Total links: {}".format(self.total_rows()))
+        elif args[0] == 'fmk':
+            await self.fmk(args,ctx)
 
 
 async def user_has_permission(allowed_roles,ctx):
@@ -157,8 +182,8 @@ waifus = picture_table_interface(table_name='waifus',database_connection=conn,da
 hentai = picture_table_interface(table_name='hentai',database_connection=conn,database_cursor=c,isNSFW=True)
 
 def create_tables():
-    c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
-    c.execute('CREATE TABLE IF NOT EXISTS waifus(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER)')
+    c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER, fucked INTEGER, married INTEGER, killed INTEGER)')
+    c.execute('CREATE TABLE IF NOT EXISTS waifus(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER, fucked INTEGER, married INTEGER, killed INTEGER)')
     conn.commit()
 
 BOT_PREFIX = "."
