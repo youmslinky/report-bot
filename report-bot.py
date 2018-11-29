@@ -137,9 +137,12 @@ class picture_table_interface():
         try:
             reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
-            pass
-            #await ctx.send('timed out')
+            for emoji,_ in emoji_dic.items():
+                await msg.remove_reaction(emoji,msg.author)
         else:
+            for emoji,_ in emoji_dic.items():
+                if emoji != reaction.emoji:
+                    await msg.remove_reaction(emoji,msg.author)
             self.database_cursor.execute("UPDATE {0} SET {1} = {1} + 1 WHERE id = {2}".format(self.table_name,emoji_dic[reaction.emoji],int(image_id)))
             self.database_connection.commit()
 
