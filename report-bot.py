@@ -155,7 +155,7 @@ class picture_table_interface():
         elif args[0] == 'total':
             await ctx.send("Total links: {}".format(self.total_rows()))
         elif args[0] == 'fmk':
-            await self.fmk(args,ctx)
+            await self.check_if_nsfw(args,ctx,self.fmk)
 
 
 async def user_has_permission(allowed_roles,ctx):
