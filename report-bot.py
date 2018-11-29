@@ -133,7 +133,7 @@ class picture_table_interface():
         await msg.add_reaction(KNIFE_EMOJI)
 
         def check(reaction, user):
-            return reaction.message.id == msg.id and user == ctx.message.author #and str(reaction.emoji) == '👍'
+            return reaction.message.id == msg.id and user == ctx.message.author
         try:
             reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=check)
         except asyncio.TimeoutError:
