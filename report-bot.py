@@ -157,7 +157,7 @@ class picture_table_interface():
             await self.check_if_nsfw(args,ctx,self.view_link)
         elif args[0] == 'total':
             await ctx.send("Total links: {}".format(self.total_rows()))
-        elif args[0] == 'fmk':
+        elif args[0] in {'fmk','f','m','k'}:
             await self.check_if_nsfw(args,ctx,self.fmk)
 
 
