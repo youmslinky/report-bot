@@ -23,7 +23,7 @@ emoji_dic = {
 
 DATABASE_NAME = "bot.db"
 ALLOWED_ROLES = [
-"454966304864993281"]
+454966304864993281]
 #bot commander 454966304864993281
 
 class picture_table_interface():
@@ -168,7 +168,7 @@ async def user_has_permission(allowed_roles,ctx):
     try:
         #print(ctx.message.author.roles)
         for role in ctx.message.author.roles:
-            print(role,role.id)
+            #print(role,role.id)
             if role.id in allowed_roles:
                 return True
         await ctx.send("{} does not have permission to do that".format(ctx.message.author))
