@@ -330,9 +330,10 @@ async def report():
 
 #https://github.com/Rapptz/discord.py/blob/async/examples/basic_bot.py
 @bot.command(name = "choose",
-                description = "picks choices out from a list of choices"
+                description = "picks choices out from a list of choices",
+                aliases=["pick","choice"]
                 )
-async def choose(*choices : str):
+async def choose(ctx,*choices : str):
     await ctx.send(random.choice(choices))
 
 # Direct link to c9 ide
