@@ -11,6 +11,9 @@ from datetime import datetime as dt
 
 import sqlite3
 import validators
+import json
+
+import imgur
 
 EGGPLANT_EMOJI = "🍆"
 HEARTS_EMOJI = "💕"
