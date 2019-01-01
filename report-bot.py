@@ -80,21 +80,21 @@ class picture_table_interface():
 
     async def add_links(self,args,ctx):
         #adds links, can add multiple links seperated by spaces
-        for link in args[1:]:
-            if validators.url(link):
-                time_now = int(round(time.time()))
-                respJson = await imgur.image_upload(imageData=link,clientID=config['imgurClientID'])
-                await imgur.add_to_album(imageDeleteHashes=[respJson['data']['deletehash']],albumDeleteHash=self.albumDeleteHash,clientID=config['imgurClientID'])
-                self.database_cursor.execute("INSERT INTO {} (deleteHash,link,originalLink,contributor,unixTimeAdded,viewNumber,unixTimeLastViewed,fucked,married,killed) VALUES (?,?,?,?,?,?,?,?,?,?)".format(self.table_name),
-                                          (respJson['data']['deletehash'],respJson['data']['link'],args[1], str(ctx.message.author), time_now, 0, time_now, 0, 0, 0))
-                #self.database_cursor.execute(f"UPDATE {self.table_name} SET deleteHash='{respJson['data']['deletehash']}' WHERE id={int(pic_id)}")
-                self.database_cursor.execute("select id from {} order by unixtimelastviewed desc limit 1".format(self.table_name))
-                for row in self.database_cursor:
-                    await ctx.send("Submission added. link id: {}".format(row['id']))
-            else:
-                await ctx.send("invalid link")
-        self.database_connection.commit()
-        return
+        async with ctx.channel.typing():
+            for link in args[1:]:
+                if validators.url(link):
+                    time_now = int(round(time.time()))
+                    respJson = await imgur.image_upload(imageData=link,clientID=config['imgurClientID'])
+                    await imgur.add_to_album(imageDeleteHashes=[respJson['data']['deletehash']],albumDeleteHash=self.albumDeleteHash,clientID=config['imgurClientID'])
+                    self.database_cursor.execute("INSERT INTO {} (deleteHash,link,originalLink,contributor,unixTimeAdded,viewNumber,unixTimeLastViewed,fucked,married,killed) VALUES (?,?,?,?,?,?,?,?,?,?)".format(self.table_name),
+                                              (respJson['data']['deletehash'],respJson['data']['link'],args[1], str(ctx.message.author), time_now, 0, time_now, 0, 0, 0))
+                    #self.database_cursor.execute(f"UPDATE {self.table_name} SET deleteHash='{respJson['data']['deletehash']}' WHERE id={int(pic_id)}")
+                    self.database_cursor.execute("select id from {} order by unixtimelastviewed desc limit 1".format(self.table_name))
+                    for row in self.database_cursor:
+                        await ctx.send("Submission added. link id: {}".format(row['id']))
+                else:
+                    await ctx.send("invalid link")
+            self.database_connection.commit()
 
     async def rm_links(self,args,ctx):
         if await user_has_permission(ALLOWED_ROLES,ctx):
@@ -154,26 +154,27 @@ class picture_table_interface():
             self.database_connection.commit()
 
     async def rehost(self,args,ctx):
-        for pic_id in args[1:]:
-            self.database_cursor.execute("SELECT COUNT(*) FROM {} WHERE id=?".format(self.table_name),(int(pic_id),) )
-            for row in self.database_cursor:
-                rowcount = row['count(*)']
-            if rowcount == 1:
-                self.database_cursor.execute("SELECT * FROM {} WHERE id=?".format(self.table_name),(int(pic_id),) )
-                respJson = json.dumps({})
+        async with ctx.channel.typing():
+            for pic_id in args[1:]:
+                self.database_cursor.execute("SELECT COUNT(*) FROM {} WHERE id=?".format(self.table_name),(int(pic_id),) )
                 for row in self.database_cursor:
-                    if(row['deleteHash'] is not None):
-                        await ctx.send("this image has been rehosted already")
-                        return
-                    respJson = await imgur.image_upload(imageData=row['link'],clientID=config['imgurClientID'])
-                self.database_cursor.execute(f"UPDATE {self.table_name} SET originalLink=link WHERE id={int(pic_id)}")
-                self.database_cursor.execute(f"UPDATE {self.table_name} SET link='{respJson['data']['link']}' WHERE id={int(pic_id)}")
-                self.database_cursor.execute(f"UPDATE {self.table_name} SET deleteHash='{respJson['data']['deletehash']}' WHERE id={int(pic_id)}")
-                self.database_connection.commit()
-                await imgur.add_to_album(imageDeleteHashes=[respJson['data']['deletehash']],albumDeleteHash=self.albumDeleteHash,clientID=config['imgurClientID'])
-                await ctx.send(f"reshosted at: {respJson['data']['link']}")
-            else:
-                await ctx.send("id: {} doesn't exist".format(pic_id))
+                    rowcount = row['count(*)']
+                if rowcount == 1:
+                    self.database_cursor.execute("SELECT * FROM {} WHERE id=?".format(self.table_name),(int(pic_id),) )
+                    respJson = json.dumps({})
+                    for row in self.database_cursor:
+                        if(row['deleteHash'] is not None):
+                            await ctx.send("this image has been rehosted already")
+                            return
+                        respJson = await imgur.image_upload(imageData=row['link'],clientID=config['imgurClientID'])
+                    self.database_cursor.execute(f"UPDATE {self.table_name} SET originalLink=link WHERE id={int(pic_id)}")
+                    self.database_cursor.execute(f"UPDATE {self.table_name} SET link='{respJson['data']['link']}' WHERE id={int(pic_id)}")
+                    self.database_cursor.execute(f"UPDATE {self.table_name} SET deleteHash='{respJson['data']['deletehash']}' WHERE id={int(pic_id)}")
+                    self.database_connection.commit()
+                    await imgur.add_to_album(imageDeleteHashes=[respJson['data']['deletehash']],albumDeleteHash=self.albumDeleteHash,clientID=config['imgurClientID'])
+                    await ctx.send(f"reshosted at: {respJson['data']['link']}")
+                else:
+                    await ctx.send("id: {} doesn't exist".format(pic_id))
 
     async def change_link(self,args,ctx):
         if len(args) != 3:
