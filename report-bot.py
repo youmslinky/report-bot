@@ -25,6 +25,7 @@ emoji_dic = {
         }
 
 DATABASE_NAME = "bot.db"
+CONFIG_FILE_NAME = 'config.json'
 ALLOWED_ROLES = [
 454966304864993281]
 #bot commander 454966304864993281
@@ -375,13 +376,25 @@ async def database_download(ctx,*args):
     fileToSend = discord.File(fp=DATABASE_NAME,filename=fileName)
     await ctx.send(file=fileToSend)
 
+def load_config():
+    try:
+        with open(CONFIG_FILE_NAME,'r') as f:
+            config = json.load(f)
+        return config
+    except FileNotFoundError as err:
+        #print(err.args)
+        raise FileNotFoundError('You need a file named "config.json" with an appropriate discord key to run this bot')
+        #print('You need a file named "config.json" with an appropriate discord key to run this bot')
+
 #start main program
-try:
-    f = open('keyfile.key','r')
-    botServiceKey = f.read()
-    f.close()
-except:
-    print('You need a file named "keyfile.key" with an appropriate discord key to run this bot')
 time_start = time.time()
-create_tables()
-bot.run (botServiceKey.strip())
+try:
+    config = load_config()
+    hentai.albumDeleteHash = config['hentai']['album']['deleteHash']
+    waifus.albumDeleteHash = config['waifus']['album']['deleteHash']
+    create_tables()
+    bot.run (config['discordClientID'])
+except:
+    #await bot.close()
+    print('failed')
+
