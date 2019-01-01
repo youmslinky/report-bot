@@ -153,6 +153,39 @@ class picture_table_interface():
             self.database_cursor.execute("UPDATE {0} SET {1} = {1} + 1 WHERE id = {2}".format(self.table_name,emoji_dic[reaction.emoji],int(image_id)))
             self.database_connection.commit()
 
+    async def rehost(self,args,ctx):
+        for pic_id in args[1:]:
+            self.database_cursor.execute("SELECT COUNT(*) FROM {} WHERE id=?".format(self.table_name),(int(pic_id),) )
+            for row in self.database_cursor:
+                rowcount = row['count(*)']
+            if rowcount == 1:
+                self.database_cursor.execute("SELECT * FROM {} WHERE id=?".format(self.table_name),(int(pic_id),) )
+                respJson = json.dumps({})
+                for row in self.database_cursor:
+                    if(row['deleteHash'] is not None):
+                        await ctx.send("this image has been rehosted already")
+                        return
+                    respJson = await imgur.image_upload(imageData=row['link'],clientID=config['imgurClientID'])
+                self.database_cursor.execute(f"UPDATE {self.table_name} SET originalLink=link WHERE id={int(pic_id)}")
+                self.database_cursor.execute(f"UPDATE {self.table_name} SET link='{respJson['data']['link']}' WHERE id={int(pic_id)}")
+                self.database_cursor.execute(f"UPDATE {self.table_name} SET deleteHash='{respJson['data']['deletehash']}' WHERE id={int(pic_id)}")
+                self.database_connection.commit()
+                await imgur.add_to_album(imageDeleteHashes=[respJson['data']['deletehash']],albumDeleteHash=self.albumDeleteHash,clientID=config['imgurClientID'])
+                await ctx.send(f"reshosted at: {respJson['data']['link']}")
+            else:
+                await ctx.send("id: {} doesn't exist".format(pic_id))
+
+    async def change_link(self,args,ctx):
+        if len(args) != 3:
+            await ctx.send("This command requires 2 arguments ex: .w 42 http://example.link")
+            return
+        pic_id = args[1]
+        self.database_cursor.execute(f"UPDATE {self.table_name} SET deleteHash=null WHERE id={int(pic_id)}")
+        self.database_cursor.execute(f"UPDATE {self.table_name} SET originalLink=link WHERE id={int(pic_id)}")
+        self.database_cursor.execute(f"UPDATE {self.table_name} SET link='{args[2]}' WHERE id={int(pic_id)}")
+        self.database_connection.commit()
+        await ctx.send(f"id {pic_id} link changed")
+
     async def handle_command(self,args,ctx):
         if len(args)== 0:
             await self.check_if_nsfw(args,ctx,self.post_random_link)
@@ -166,6 +199,10 @@ class picture_table_interface():
             await ctx.send("Total links: {}".format(self.total_rows()))
         elif args[0] in {'fmk','f','m','k'}:
             await self.check_if_nsfw(args,ctx,self.fmk)
+        elif args[0] == "rehost":
+            await self.check_if_nsfw(args,ctx,self.rehost)
+        elif args[0] == "relink":
+            await self.check_if_nsfw(args,ctx,self.change_link)
         else:
             await ctx.send(f"unkown option: {args[0]}")
 
