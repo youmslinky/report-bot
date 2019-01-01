@@ -83,8 +83,11 @@ class picture_table_interface():
         for link in args[1:]:
             if validators.url(link):
                 time_now = int(round(time.time()))
-                self.database_cursor.execute("INSERT INTO {} (link,contributor,unixTimeAdded,viewNumber,unixTimeLastViewed,fucked,married,killed) VALUES (?,?,?,?,?,?,?,?)".format(self.table_name),
-                                          (args[1], str(ctx.message.author), time_now, 0, time_now, 0, 0, 0))
+                respJson = await imgur.image_upload(imageData=link,clientID=config['imgurClientID'])
+                await imgur.add_to_album(imageDeleteHashes=[respJson['data']['deletehash']],albumDeleteHash=self.albumDeleteHash,clientID=config['imgurClientID'])
+                self.database_cursor.execute("INSERT INTO {} (deleteHash,link,originalLink,contributor,unixTimeAdded,viewNumber,unixTimeLastViewed,fucked,married,killed) VALUES (?,?,?,?,?,?,?,?,?,?)".format(self.table_name),
+                                          (respJson['data']['deletehash'],respJson['data']['link'],args[1], str(ctx.message.author), time_now, 0, time_now, 0, 0, 0))
+                #self.database_cursor.execute(f"UPDATE {self.table_name} SET deleteHash='{respJson['data']['deletehash']}' WHERE id={int(pic_id)}")
                 self.database_cursor.execute("select id from {} order by unixtimelastviewed desc limit 1".format(self.table_name))
                 for row in self.database_cursor:
                     await ctx.send("Submission added. link id: {}".format(row['id']))
