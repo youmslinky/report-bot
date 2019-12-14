@@ -429,13 +429,9 @@ def load_config():
 
 #start main program
 time_start = time.time()
-try:
-    config = load_config()
-    hentai.albumDeleteHash = config['hentai']['album']['deleteHash']
-    waifus.albumDeleteHash = config['waifus']['album']['deleteHash']
-    create_tables()
-    bot.run (config['discordClientID'])
-except:
-    #await bot.close()
-    print('failed')
+config = load_config()
+hentai.albumDeleteHash = config['hentai']['album']['deleteHash']
+waifus.albumDeleteHash = config['waifus']['album']['deleteHash']
+create_tables()
+bot.run (config['discordClientID'])
 
