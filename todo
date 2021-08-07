@@ -1,0 +1,19 @@
+the class should be changed to only deal with state of the database connection/database,
+not handle sending things to discord channels
+	for example, the "post_random_link()" method should be something more like:
+	"random_link()" and have it return a random link instead of just sending it
+the command handler should use the new command group structure.
+	this should allow much easier managing of commands
+
+
+await ctx.message.add_reaction('\U0001F44D')
+
+done* add images to anonymous album
+done* keep imgur link (or ID) and delete hash
+done* rehost image with command ".w rehost 33" to rehost existing database link to imgur
+
+send error messages to discord, so people know what is going on
+
+add fmk map in sqlite.  many to many relationship, so it can track who fmked which images.
+	this would involve making a table of discord user ids
+		and a table mapping many users to many images
