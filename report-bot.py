@@ -1,3 +1,9 @@
+# this file has some uncommitted changes that I think should be potentially
+# kept (such as total_rows), but I'd need to test them to make sure they are
+# working first
+
+
+
 # Access github : https://github.com/youmslinky/report-bot
 # Doug was here
 import discord
@@ -40,6 +46,18 @@ class picture_table_interface():
 
     def is_nsfw(self):
         return self.isNSFW
+
+    #def nsfw_check_decorator(func):
+    #    async def wrapper(self,*args,**kwargs):
+    #        if isinstance(ctx.channel, discord.abc.PrivateChannel):
+    #            #this is a private channel, we don't need to check
+    #            await function(args,ctx)
+    #            return
+    #        return
+    #        if self.is_nsfw:
+    #            await func(self,*args,**kwargs)
+    #        else:
+    #            await
 
     async def check_if_nsfw(self,args,ctx,function):
         if isinstance(ctx.channel, discord.abc.PrivateChannel):
@@ -127,12 +145,28 @@ class picture_table_interface():
                 await ctx.send("id: {} doesn't exist".format(pic_id))
         return
 
-    def total_rows(self):
-        self.database_cursor.execute("select count(rowid) from {}".format(self.table_name))
-        for row in self.database_cursor:
-            return row['count(rowid)']
+    async def total_rows(self,args,ctx):
+        if len(args) == 1:
+            self.database_cursor.execute("select count(rowid) from {}".format(self.table_name))
+            for row in self.database_cursor:
+                await ctx.send("Total links: {}".format(row['count(rowid)']))
+        if len(args) >= 2:
+            userCount = 0
+            totalCount = 0
+            self.database_cursor.execute("select count(rowid) from {} where contributor like ?".format(self.table_name),('%'+args[1]+'%',))
+            for row in self.database_cursor:
+                userCount = row['count(rowid)']
+            self.database_cursor.execute("select count(rowid) from {}".format(self.table_name))
+            for row in self.database_cursor:
+                totalCount = row['count(rowid)']
+            percent = (float(userCount)/totalCount)*100
+            await ctx.send(f"total links by {args[1]}: {userCount}/{totalCount} ({percent:.2f}%)")
+
 
     async def fmk(self,args,ctx):
+        #self.database_cursor.execute(f"insert into fmk(userID, fmkType, fmkDateTime) values(2,'f',datetime('now'))",(,))
+        if(self.add_user(args,ctx)==1):
+            await ctx.send("You were added to the list of users " + ctx.message.author.mention)
         #adds reactions to a message and then waits for a user to add another then adds the result to the database
         msg,image_id = await self.post_random_link(args,ctx)
         await msg.add_reaction(EGGPLANT_EMOJI)
@@ -187,6 +221,19 @@ class picture_table_interface():
         self.database_connection.commit()
         await ctx.send(f"id {pic_id} link changed")
 
+    def add_user(self,args,ctx):
+        self.database_cursor.execute(f"SELECT COUNT(1) FROM users WHERE discordUserName=?",(str(ctx.message.author),) )
+        rowcount = 1
+        for row in self.database_cursor:
+            rowcount = row['count(1)']
+        if rowcount == 0:
+            self.database_cursor.execute(f"INSERT INTO users(discordUserName) VALUES(?)",(str(ctx.message.author),) )
+            self.database_connection.commit()
+            return 1
+        else:
+            return 0
+
+
     async def handle_command(self,args,ctx):
         if len(args)== 0:
             await self.check_if_nsfw(args,ctx,self.post_random_link)
@@ -197,13 +244,15 @@ class picture_table_interface():
         elif args[0].isdigit():
             await self.check_if_nsfw(args,ctx,self.view_link)
         elif args[0] == 'total':
-            await ctx.send("Total links: {}".format(self.total_rows()))
+            await self.total_rows(args,ctx)
         elif args[0] in {'fmk','f','m','k'}:
             await self.check_if_nsfw(args,ctx,self.fmk)
         elif args[0] == "rehost":
             await self.check_if_nsfw(args,ctx,self.rehost)
         elif args[0] == "relink":
             await self.check_if_nsfw(args,ctx,self.change_link)
+        elif args[0] == "addme":
+            await self.add_user(args,ctx)
         else:
             await ctx.send(f"unkown option: {args[0]}")
 
@@ -229,15 +278,17 @@ conn = sqlite3.connect(DATABASE_NAME)
 conn.row_factory = sqlite3.Row
 c = conn.cursor()
 
-waifus = picture_table_interface(table_name='waifus',database_connection=conn,database_cursor=c,isNSFW=False)
-hentai = picture_table_interface(table_name='hentai',database_connection=conn,database_cursor=c,isNSFW=True)
+waifus = picture_table_interface(table_name='waifus',database_connection=conn,database_cursor=c,isNSFW=False)#,albumDeleteHash=config['waifus']['album']['deleteHash'])
+hentai = picture_table_interface(table_name='hentai',database_connection=conn,database_cursor=c,isNSFW=True)#,albumDeleteHash=config['hentai']['album']['deleteHash'])
 
 def create_tables():
     c.execute('CREATE TABLE IF NOT EXISTS hentai(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER, fucked INTEGER, married INTEGER, killed INTEGER)')
     c.execute('CREATE TABLE IF NOT EXISTS waifus(id INTEGER PRIMARY KEY, link TEXT, contributor TEXT, unixTimeAdded INTEGER, unixTimeLastViewed INTEGER, viewNumber INTEGER, fucked INTEGER, married INTEGER, killed INTEGER)')
+    c.execute('CREATE TABLE IF NOT EXISTS users(userID INTEGER PRIMARY KEY, discordUserName TEXT)')
+    c.execute('CREATE TABLE IF NOT EXISTS fmk(fmkID INTEGER PRIMARY KEY, userID INTEGER, fmkType TEXT, fmkDateTime DATETIME)')
     conn.commit()
 
-BOT_PREFIX = "."
+BOT_PREFIX = ","
 #Client = discord.Client()
 #client = commands.Bot (command_prefix = ".") # need this for @client.event's to work.
 #client = Bot(command_prefix=BOT_PREFIX)
@@ -267,18 +318,20 @@ async def on_ready():
                 aliases=['eight_ball','eightball','8-ball'],
                 )
 async def eight_ball(ctx):
-    possible_responses = [
-        'Thats gonna be a no from me dawg',
-        'It is not looking likely',
-        'Hell no',
-        'Too hard to tell',
-        'It is quite possible',
-        'Definitely',
-        'Yes',
-        'No',
-        'Mmmmmmmmmmmmmmmmmm no'
-        ]
-    await ctx.send(random.choice(possible_responses) + ", " + ctx.message.author.mention)
+    async with ctx.channel.typing():
+        await asyncio.sleep(1,4)
+        possible_responses = [
+            'Thats gonna be a no from me dawg',
+            'It is not looking likely',
+            'Hell no',
+            'Too hard to tell',
+            'It is quite possible',
+            'Definitely',
+            'Yes',
+            'No',
+            'Mmmmmmmmmmmmmmmmmm no'
+            ]
+        await ctx.send(random.choice(possible_responses) + ", " + ctx.message.author.mention)
 
 @bot.command(name="summon",
                 description='summons things',
@@ -316,34 +369,20 @@ async def hentai_pics(ctx,*args):
                 )
 async def waifu(ctx,*args):
     await waifus.handle_command(args,ctx)
-    return
-    if args[0] == "rules":
-        #await ctx.send("Rules:\n1. No nips\n2. No peens\n3. Keep it 2D\n4. Doesn't have to be human\n5. Keep yer hands off the small kids; Only big ones are allowed\n6. Keep yer hands above the table\n7. Dear GOD I hope we can all handle undies")
-        await ctx.send("Rules:\n1. Nothing explicit, Pls keep this SFW\n2. Only waifus\n3. If you have a question, it prolly goes to .h\n4. No real people")
-        return
-    if args[0] == "remove":
-        if "454966304864993281" in [role.id for role in ctx.message.author.roles]:
-            # file_pointer = open('dick_pics', 'a')
-            # for link in args[1:]:
-            #     if validators.url(link):
-            #         #file_pointer.remove('dick_pics', args[1])
-            #         print (args[1])
-            #         await ctx.send("Link removed")
-                with open('dick_pics') as file_pointer:
-                    #file_pointer = open('dick_pics', 'r+')
-                    for link in args[1:]:
-                        #try:
-                            if validators.url(link):
-                                #file_pointer.list.remove(line.strip () + args[1])
-                                #file_pointer.remove("%s" % args[1])
-                                file_pointer.remove (args[1])
-                                print (args[1])
-                                await ctx.send("Link removed")
-                        #except:
-                            #await ctx.send("Ya, that didn't work")
-        else:
-            await ctx.send("You are not worthy") #await ctx.send("You do not have permission)")
 
+async def get_last_pic_id(ctx):
+    id = None #id of the latest pic that was posted after a .w or .h
+    prevMessage = None #for keeping track of previous message in for loop
+    userMessage = None #what command was run to post the pic link .w,.h,etc.
+    async for message in ctx.history(limit=10):
+        if ctx.message.author == message.author and ".w" in message.content:
+            if "image id:" in prevMessage.content:
+                id = prevMessage.content.split()[-1]
+                userMessage = message
+                break
+            #print("Author: {}\n{}".format(str(message.author),message.content))
+        prevMessage = message
+    return id,userMessage
 
 # Add code for dice rolls of different sizes
 @bot.command(name='roll',
@@ -429,9 +468,13 @@ def load_config():
 
 #start main program
 time_start = time.time()
-config = load_config()
-hentai.albumDeleteHash = config['hentai']['album']['deleteHash']
-waifus.albumDeleteHash = config['waifus']['album']['deleteHash']
-create_tables()
-bot.run (config['discordClientID'])
+try:
+    config = load_config()
+    hentai.albumDeleteHash = config['hentai']['album']['deleteHash']
+    waifus.albumDeleteHash = config['waifus']['album']['deleteHash']
+    create_tables()
+    bot.run (config['discordClientID'])
+except:
+    #await bot.close()
+    print('failed')
 
