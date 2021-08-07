@@ -1,0 +1,16 @@
+{
+	"discordClientID":	"discordbotidgoeshere1234.12345678sfdoiwejoifsdlkfweio892ruf",
+	"imgurClientID":	"imgurkey1234567",
+	"waifus": {
+		"album": {
+			"id": "albumid",
+			"deleteHash": "deletehashhere1"
+		}
+	},
+	"hentai": {
+		"album": {
+			"id": "albumid",
+			"deleteHash": "deletehashhere1"
+		}
+	}
+}
