@@ -241,7 +241,7 @@ BOT_PREFIX = "."
 #Client = discord.Client()
 #client = commands.Bot (command_prefix = ".") # need this for @client.event's to work.
 #client = Bot(command_prefix=BOT_PREFIX)
-bot = commands.Bot(command_prefix=BOT_PREFIX,activity=discord.Game("with other lolis"))
+bot = commands.Bot(command_prefix=BOT_PREFIX,activity=discord.Game("with other lolis"),case_insensitive=True)
 
 
 @bot.event
@@ -301,7 +301,7 @@ async def summon(ctx, *args):
 @bot.command(name='hentai',
                 description="Actually hentai, only allowed in nsfw channels", #great description guys
                 brief="quenches all your desires",
-                aliases=["h", "H"],
+                aliases=["h"],
                 )
 async def hentai_pics(ctx,*args):
     await hentai.handle_command(args,ctx)
@@ -312,7 +312,7 @@ async def hentai_pics(ctx,*args):
 @bot.command(name='waifu',
                 description="actually waifus",
                 brief="quenches all your desires for realsies",
-                aliases=["w", "W", "waifus", "Waifus"],
+                aliases=["w", "waifus"],
                 )
 async def waifu(ctx,*args):
     await waifus.handle_command(args,ctx)
