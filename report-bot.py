@@ -400,6 +400,7 @@ async def uptime(ctx):
 # posts link to github for project
 @bot.command(name='github',
                 description="posts github link",
+                aliases=["git"],
                 )
 async def github(ctx):
     await ctx.send(str(ctx.message.author.mention) + ", https://github.com/youmslinky/report-bot")
